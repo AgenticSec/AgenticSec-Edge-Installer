@@ -1,6 +1,6 @@
 [Unit]
 Description=RapidPen Supervisor Service
-Documentation=https://github.com/AgenticSec/RapidPen
+Documentation=https://github.com/AgenticSec/AgenticSec
 After=docker.service
 Requires=docker.service
 

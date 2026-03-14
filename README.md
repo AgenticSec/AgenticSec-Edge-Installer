@@ -1,4 +1,4 @@
-# RapidPen Edge Installer
+# AgenticSec Edge Installer
 
 Official installer for RapidPen Supervisor.
 

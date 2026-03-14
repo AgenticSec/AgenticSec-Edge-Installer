@@ -21,7 +21,7 @@ log_warn() {
 }
 
 echo "==========================================="
-echo "  RapidPen Edge Uninstaller               "
+echo "  AgenticSec Edge Uninstaller               "
 echo "==========================================="
 echo ""
 
