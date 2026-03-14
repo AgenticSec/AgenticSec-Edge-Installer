@@ -72,7 +72,7 @@ fi
 log_info "Upgrade required: $IMAGE_TAG -> $TARGET_IMAGE_TAG"
 
 # Construct full image name
-FULL_IMAGE_NAME="ghcr.io/secdev-lab/rapidpen-supervisor:$TARGET_IMAGE_TAG"
+FULL_IMAGE_NAME="ghcr.io/agenticsec/rapidpen-supervisor:$TARGET_IMAGE_TAG"
 
 # Pull new image
 log_info "Pulling new image: $FULL_IMAGE_NAME"

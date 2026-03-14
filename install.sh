@@ -3,7 +3,7 @@
 # RapidPen Edge Installer - Bootstrap Script
 #
 # This script downloads the latest installer archive and runs the actual setup.
-# Usage: curl -fsSL https://raw.githubusercontent.com/SecDev-Lab/RapidPen-Edge-Installer/main/install.sh | sudo sh
+# Usage: curl -fsSL https://raw.githubusercontent.com/AgenticSec/RapidPen-Edge-Installer/main/install.sh | sudo sh
 #
 
 set -e  # Exit on error
@@ -36,7 +36,7 @@ echo ""
 log_info "Checking root privileges..."
 if [ "$(id -u)" -ne 0 ]; then
    log_error "This script must be run as root (use sudo)"
-   echo "Usage: curl -fsSL https://raw.githubusercontent.com/SecDev-Lab/RapidPen-Edge-Installer/main/install.sh | sudo sh"
+   echo "Usage: curl -fsSL https://raw.githubusercontent.com/AgenticSec/RapidPen-Edge-Installer/main/install.sh | sudo sh"
    exit 1
 fi
 log_info "✓ Running as root"
@@ -54,7 +54,7 @@ done
 log_info "✓ Required commands available"
 
 # Download and extract installer
-REPO="SecDev-Lab/RapidPen-Edge-Installer"
+REPO="AgenticSec/RapidPen-Edge-Installer"
 BRANCH="main"
 RELEASE_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz"
 

@@ -126,9 +126,9 @@ if command -v docker > /dev/null 2>&1; then
     fi
 
     # Remove supervisor image
-    if docker image inspect ghcr.io/secdev-lab/rapidpen-supervisor >/dev/null 2>&1; then
+    if docker image inspect ghcr.io/agenticsec/rapidpen-supervisor >/dev/null 2>&1; then
         # Find all tags and remove them
-        docker images --format "{{.Repository}}:{{.Tag}}" | grep "ghcr.io/secdev-lab/rapidpen-supervisor" | while read -r image; do
+        docker images --format "{{.Repository}}:{{.Tag}}" | grep "ghcr.io/agenticsec/rapidpen-supervisor" | while read -r image; do
             docker rmi "$image" > /dev/null 2>&1
             log_info "  Removed Docker image: $image"
         done

@@ -331,7 +331,7 @@ if ! command -v curl > /dev/null 2>&1; then
 fi
 
 # Supervisorバージョン決定（GitHub Releaseから取得）
-RELEASE_URL="https://github.com/SecDev-Lab/RapidPen-Edge-Installer/releases/download/supervisor-latest/supervisor-version.txt"
+RELEASE_URL="https://github.com/AgenticSec/RapidPen-Edge-Installer/releases/download/supervisor-latest/supervisor-version.txt"
 
 log_info "Fetching latest supervisor version from GitHub Release..."
 SUPERVISOR_VERSION=$(curl --max-time 30 -fsSL "$RELEASE_URL" 2>&1) || {
@@ -354,7 +354,7 @@ fi
 log_info "Latest supervisor version: $SUPERVISOR_VERSION"
 
 # Supervisorイメージを構築
-SUPERVISOR_IMAGE="ghcr.io/secdev-lab/rapidpen-supervisor:$SUPERVISOR_VERSION"
+SUPERVISOR_IMAGE="ghcr.io/agenticsec/rapidpen-supervisor:$SUPERVISOR_VERSION"
 log_info "Supervisor image: $SUPERVISOR_IMAGE"
 
 # Supervisorイメージをpull
