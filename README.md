@@ -1,15 +1,15 @@
 # AgenticSec Edge Installer
 
-Official installer for RapidPen Supervisor.
+Official installer for AgenticSec Supervisor.
 
 ## Installation
 
-Please follow the instructions in [RapidPen Web UI](https://cloud.rapidpen.app).
+Please follow the instructions in [AgenticSec Web UI](https://cloud.rapidpen.app).
 
 ## Uninstallation
 
 ```bash
-sudo rapidpen-uninstall
+sudo agenticsec-uninstall
 ```
 
 ## License

@@ -1,5 +1,5 @@
 [Unit]
-Description=Run RapidPen Edge Log Cleanup daily
+Description=Run AgenticSec Edge Log Cleanup daily
 
 [Timer]
 OnCalendar=daily

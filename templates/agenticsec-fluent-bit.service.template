@@ -1,0 +1,23 @@
+[Unit]
+Description=Fluent Bit for AgenticSec Edge Observability
+Documentation=https://docs.fluentbit.io/
+After=network.target agenticsec-supervisor.service
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStartPre=-{{DOCKER_BIN}} stop agenticsec-fluent-bit
+ExecStartPre=-{{DOCKER_BIN}} rm agenticsec-fluent-bit
+ExecStart={{DOCKER_BIN}} run --rm \
+    --name agenticsec-fluent-bit \
+    -v /var/log/agenticsec:/var/log/agenticsec:ro \
+    -v /etc/agenticsec/edge-observability/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro \
+    -v agenticsec-fluent-bit-data:/fluent-bit/data \
+    fluent/fluent-bit:latest \
+    -c /fluent-bit/etc/fluent-bit.conf
+ExecStop={{DOCKER_BIN}} stop agenticsec-fluent-bit
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

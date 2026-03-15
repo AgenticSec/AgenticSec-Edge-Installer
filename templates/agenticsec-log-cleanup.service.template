@@ -1,0 +1,6 @@
+[Unit]
+Description=AgenticSec Edge Log Cleanup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/agenticsec-log-cleanup.sh

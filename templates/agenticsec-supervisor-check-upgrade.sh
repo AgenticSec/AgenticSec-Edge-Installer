@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# RapidPen Supervisor Upgrade Check Script
+# AgenticSec Supervisor Upgrade Check Script
 #
 # This script is executed by systemd ExecStartPre to check if a supervisor upgrade is required.
 # It reads the state.json file and performs the upgrade if target_image_tag is set.
@@ -8,7 +8,7 @@
 
 set -e  # Exit on error
 
-STATE_FILE="/etc/rapidpen/supervisor/state.json"
+STATE_FILE="/etc/agenticsec/supervisor/state.json"
 LOG_PREFIX="[UPGRADE CHECK]"
 
 # Logging functions
@@ -72,7 +72,7 @@ fi
 log_info "Upgrade required: $IMAGE_TAG -> $TARGET_IMAGE_TAG"
 
 # Construct full image name
-FULL_IMAGE_NAME="ghcr.io/agenticsec/rapidpen-supervisor:$TARGET_IMAGE_TAG"
+FULL_IMAGE_NAME="ghcr.io/agenticsec/agenticsec-supervisor:$TARGET_IMAGE_TAG"
 
 # Pull new image
 log_info "Pulling new image: $FULL_IMAGE_NAME"
