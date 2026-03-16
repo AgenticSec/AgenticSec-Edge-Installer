@@ -45,6 +45,7 @@ echo "  - Docker volumes (agenticsec-fluent-bit-data)"
 echo "  - Configuration files (/etc/agenticsec/)"
 echo "  - Log files (/var/log/agenticsec/)"
 echo "  - Utility scripts (/usr/local/bin/agenticsec-*)"
+echo "  - Legacy services/files (rapidpen-*) if present"
 echo ""
 printf "Are you sure you want to continue? [y/N]: "
 read -r CONFIRM
@@ -101,6 +102,16 @@ else
     log_warn "  agenticsec-log-cleanup timer not found (skipping)"
 fi
 
+# Legacy rapidpen-* services (from before rename)
+for legacy_service in rapidpen-supervisor.service rapidpen-fluent-bit.service rapidpen-log-cleanup.timer rapidpen-log-cleanup.service; do
+    if [ -f "/etc/systemd/system/$legacy_service" ]; then
+        systemctl stop "$legacy_service" 2>/dev/null || true
+        systemctl disable "$legacy_service" 2>/dev/null || true
+        rm -f "/etc/systemd/system/$legacy_service"
+        log_info "  Removed legacy service: $legacy_service"
+    fi
+done
+
 # Reload systemd
 systemctl daemon-reload
 log_info "  Systemd daemon reloaded"
@@ -124,6 +135,14 @@ if command -v docker > /dev/null 2>&1; then
     else
         log_warn "  agenticsec-fluent-bit container not found (skipping)"
     fi
+
+    # Legacy rapidpen-* containers
+    for legacy_container in rapidpen-supervisor rapidpen-fluent-bit; do
+        if docker ps -a 2>/dev/null | grep -q "$legacy_container"; then
+            docker rm -f "$legacy_container" > /dev/null 2>&1
+            log_info "  Removed legacy container: $legacy_container"
+        fi
+    done
 
     # Remove supervisor image
     if docker image inspect ghcr.io/agenticsec/agenticsec-supervisor >/dev/null 2>&1; then
@@ -150,6 +169,12 @@ if command -v docker > /dev/null 2>&1; then
         log_info "  Removed Docker volume: agenticsec-fluent-bit-data"
     else
         log_warn "  agenticsec-fluent-bit-data volume not found (skipping)"
+    fi
+
+    # Legacy rapidpen-fluent-bit-data volume
+    if docker volume inspect rapidpen-fluent-bit-data >/dev/null 2>&1; then
+        docker volume rm rapidpen-fluent-bit-data > /dev/null 2>&1
+        log_info "  Removed legacy volume: rapidpen-fluent-bit-data"
     fi
 else
     log_warn "  Docker not found (skipping Docker cleanup)"
@@ -197,6 +222,20 @@ if [ -f "/usr/bin/agenticsec-uninstall" ]; then
 else
     log_warn "  /usr/bin/agenticsec-uninstall not found"
 fi
+
+# Legacy rapidpen paths
+for legacy_dir in /etc/rapidpen /var/log/rapidpen; do
+    if [ -d "$legacy_dir" ]; then
+        rm -rf "$legacy_dir"
+        log_info "  Removed $legacy_dir/"
+    fi
+done
+for legacy_file in /usr/local/bin/rapidpen-supervisor-check-upgrade.sh /usr/local/bin/rapidpen-log-cleanup.sh /usr/bin/rapidpen-uninstall; do
+    if [ -f "$legacy_file" ]; then
+        rm -f "$legacy_file"
+        log_info "  Removed $legacy_file"
+    fi
+done
 
 # 6. Completion message
 echo ""
