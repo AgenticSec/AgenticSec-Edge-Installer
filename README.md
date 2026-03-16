@@ -4,7 +4,7 @@ Official installer for AgenticSec Supervisor.
 
 ## Installation
 
-Please follow the instructions in [AgenticSec Web UI](https://cloud.rapidpen.app).
+Please follow the instructions in [AgenticSec Web UI](https://app.agenticsec.tech).
 
 ## Uninstallation
 
