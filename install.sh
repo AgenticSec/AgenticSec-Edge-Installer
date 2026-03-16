@@ -59,7 +59,7 @@ BRANCH="main"
 RELEASE_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz"
 
 log_info "Downloading installer from GitHub..."
-TMPDIR=$(mktemp -d /tmp/rapidpen-installer.XXXXXX)
+TMPDIR=$(mktemp -d /tmp/agenticsec-installer.XXXXXX)
 
 if ! curl -fsSL "$RELEASE_URL" | tar xz -C "$TMPDIR" --strip-components=1 2>/dev/null; then
     log_error "Failed to download or extract installer"

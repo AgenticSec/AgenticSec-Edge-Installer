@@ -1,5 +1,5 @@
 #!/bin/sh
-# RapidPen Edge Log Cleanup Script
+# AgenticSec Edge Log Cleanup Script
 # Runs daily via systemd timer to manage log retention.
 #
 # Supervisor: copytruncate rotation + 7-day retention
@@ -11,16 +11,16 @@
 #   - Delete Run directories older than RETENTION_DAYS
 set -e
 
-LOG_BASE="/var/log/rapidpen"
+LOG_BASE="/var/log/agenticsec"
 RETENTION_DAYS=7
 TODAY=$(date +%Y%m%d)
 
 log_info() {
-    logger -t rapidpen-log-cleanup "[INFO] $1"
+    logger -t agenticsec-log-cleanup "[INFO] $1"
 }
 
 log_warn() {
-    logger -t rapidpen-log-cleanup "[WARN] $1"
+    logger -t agenticsec-log-cleanup "[WARN] $1"
 }
 
 # 1. Supervisor: copytruncate rotation

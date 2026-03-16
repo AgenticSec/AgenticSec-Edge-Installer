@@ -36,15 +36,15 @@ log_info "✓ Running as root"
 
 # 2. Confirmation prompt
 echo ""
-log_warn "This will remove RapidPen Supervisor and all related files."
+log_warn "This will remove AgenticSec Supervisor and all related files."
 log_warn "The following will be removed:"
-echo "  - systemd services (rapidpen-supervisor, rapidpen-fluent-bit, rapidpen-log-cleanup)"
-echo "  - Docker containers (rapidpen-supervisor, rapidpen-fluent-bit)"
-echo "  - Docker images (rapidpen-supervisor, fluent/fluent-bit)"
-echo "  - Docker volumes (rapidpen-fluent-bit-data)"
-echo "  - Configuration files (/etc/rapidpen/)"
-echo "  - Log files (/var/log/rapidpen/)"
-echo "  - Utility scripts (/usr/local/bin/rapidpen-*)"
+echo "  - systemd services (agenticsec-supervisor, agenticsec-fluent-bit, agenticsec-log-cleanup)"
+echo "  - Docker containers (agenticsec-supervisor, agenticsec-fluent-bit)"
+echo "  - Docker images (agenticsec-supervisor, fluent/fluent-bit)"
+echo "  - Docker volumes (agenticsec-fluent-bit-data)"
+echo "  - Configuration files (/etc/agenticsec/)"
+echo "  - Log files (/var/log/agenticsec/)"
+echo "  - Utility scripts (/usr/local/bin/agenticsec-*)"
 echo ""
 printf "Are you sure you want to continue? [y/N]: "
 read -r CONFIRM
@@ -61,44 +61,44 @@ log_info "Starting uninstallation..."
 log_info "Stopping and disabling systemd services..."
 
 # Supervisor service
-if [ -f "/etc/systemd/system/rapidpen-supervisor.service" ]; then
-    systemctl stop rapidpen-supervisor 2>/dev/null || true
-    log_info "  Stopped rapidpen-supervisor service"
+if [ -f "/etc/systemd/system/agenticsec-supervisor.service" ]; then
+    systemctl stop agenticsec-supervisor 2>/dev/null || true
+    log_info "  Stopped agenticsec-supervisor service"
 
-    systemctl disable rapidpen-supervisor 2>/dev/null || true
-    log_info "  Disabled rapidpen-supervisor service"
+    systemctl disable agenticsec-supervisor 2>/dev/null || true
+    log_info "  Disabled agenticsec-supervisor service"
 
-    rm -f /etc/systemd/system/rapidpen-supervisor.service
-    log_info "  Removed rapidpen-supervisor service file"
+    rm -f /etc/systemd/system/agenticsec-supervisor.service
+    log_info "  Removed agenticsec-supervisor service file"
 else
-    log_warn "  rapidpen-supervisor service not found (skipping)"
+    log_warn "  agenticsec-supervisor service not found (skipping)"
 fi
 
 # Fluent Bit service
-if [ -f "/etc/systemd/system/rapidpen-fluent-bit.service" ]; then
-    systemctl stop rapidpen-fluent-bit 2>/dev/null || true
-    log_info "  Stopped rapidpen-fluent-bit service"
+if [ -f "/etc/systemd/system/agenticsec-fluent-bit.service" ]; then
+    systemctl stop agenticsec-fluent-bit 2>/dev/null || true
+    log_info "  Stopped agenticsec-fluent-bit service"
 
-    systemctl disable rapidpen-fluent-bit 2>/dev/null || true
-    log_info "  Disabled rapidpen-fluent-bit service"
+    systemctl disable agenticsec-fluent-bit 2>/dev/null || true
+    log_info "  Disabled agenticsec-fluent-bit service"
 
-    rm -f /etc/systemd/system/rapidpen-fluent-bit.service
-    log_info "  Removed rapidpen-fluent-bit service file"
+    rm -f /etc/systemd/system/agenticsec-fluent-bit.service
+    log_info "  Removed agenticsec-fluent-bit service file"
 else
-    log_warn "  rapidpen-fluent-bit service not found (skipping)"
+    log_warn "  agenticsec-fluent-bit service not found (skipping)"
 fi
 
 # Log cleanup timer/service
-if [ -f "/etc/systemd/system/rapidpen-log-cleanup.timer" ]; then
-    systemctl stop rapidpen-log-cleanup.timer 2>/dev/null || true
-    systemctl disable rapidpen-log-cleanup.timer 2>/dev/null || true
-    log_info "  Stopped and disabled rapidpen-log-cleanup timer"
+if [ -f "/etc/systemd/system/agenticsec-log-cleanup.timer" ]; then
+    systemctl stop agenticsec-log-cleanup.timer 2>/dev/null || true
+    systemctl disable agenticsec-log-cleanup.timer 2>/dev/null || true
+    log_info "  Stopped and disabled agenticsec-log-cleanup timer"
 
-    rm -f /etc/systemd/system/rapidpen-log-cleanup.timer
-    rm -f /etc/systemd/system/rapidpen-log-cleanup.service
-    log_info "  Removed rapidpen-log-cleanup timer and service files"
+    rm -f /etc/systemd/system/agenticsec-log-cleanup.timer
+    rm -f /etc/systemd/system/agenticsec-log-cleanup.service
+    log_info "  Removed agenticsec-log-cleanup timer and service files"
 else
-    log_warn "  rapidpen-log-cleanup timer not found (skipping)"
+    log_warn "  agenticsec-log-cleanup timer not found (skipping)"
 fi
 
 # Reload systemd
@@ -110,30 +110,30 @@ log_info "Cleaning up Docker resources..."
 
 if command -v docker > /dev/null 2>&1; then
     # Stop and remove supervisor container
-    if docker ps -a 2>/dev/null | grep -q rapidpen-supervisor; then
-        docker rm -f rapidpen-supervisor > /dev/null 2>&1
-        log_info "  Removed rapidpen-supervisor container"
+    if docker ps -a 2>/dev/null | grep -q agenticsec-supervisor; then
+        docker rm -f agenticsec-supervisor > /dev/null 2>&1
+        log_info "  Removed agenticsec-supervisor container"
     else
-        log_warn "  rapidpen-supervisor container not found (skipping)"
+        log_warn "  agenticsec-supervisor container not found (skipping)"
     fi
 
     # Stop and remove fluent-bit container
-    if docker ps -a 2>/dev/null | grep -q rapidpen-fluent-bit; then
-        docker rm -f rapidpen-fluent-bit > /dev/null 2>&1
-        log_info "  Removed rapidpen-fluent-bit container"
+    if docker ps -a 2>/dev/null | grep -q agenticsec-fluent-bit; then
+        docker rm -f agenticsec-fluent-bit > /dev/null 2>&1
+        log_info "  Removed agenticsec-fluent-bit container"
     else
-        log_warn "  rapidpen-fluent-bit container not found (skipping)"
+        log_warn "  agenticsec-fluent-bit container not found (skipping)"
     fi
 
     # Remove supervisor image
-    if docker image inspect ghcr.io/agenticsec/rapidpen-supervisor >/dev/null 2>&1; then
+    if docker image inspect ghcr.io/agenticsec/agenticsec-supervisor >/dev/null 2>&1; then
         # Find all tags and remove them
-        docker images --format "{{.Repository}}:{{.Tag}}" | grep "ghcr.io/agenticsec/rapidpen-supervisor" | while read -r image; do
+        docker images --format "{{.Repository}}:{{.Tag}}" | grep "ghcr.io/agenticsec/agenticsec-supervisor" | while read -r image; do
             docker rmi "$image" > /dev/null 2>&1
             log_info "  Removed Docker image: $image"
         done
     else
-        log_warn "  rapidpen-supervisor image not found (skipping)"
+        log_warn "  agenticsec-supervisor image not found (skipping)"
     fi
 
     # Remove fluent-bit image
@@ -145,11 +145,11 @@ if command -v docker > /dev/null 2>&1; then
     fi
 
     # Remove fluent-bit data volume (DB persistence)
-    if docker volume inspect rapidpen-fluent-bit-data >/dev/null 2>&1; then
-        docker volume rm rapidpen-fluent-bit-data > /dev/null 2>&1
-        log_info "  Removed Docker volume: rapidpen-fluent-bit-data"
+    if docker volume inspect agenticsec-fluent-bit-data >/dev/null 2>&1; then
+        docker volume rm agenticsec-fluent-bit-data > /dev/null 2>&1
+        log_info "  Removed Docker volume: agenticsec-fluent-bit-data"
     else
-        log_warn "  rapidpen-fluent-bit-data volume not found (skipping)"
+        log_warn "  agenticsec-fluent-bit-data volume not found (skipping)"
     fi
 else
     log_warn "  Docker not found (skipping Docker cleanup)"
@@ -159,43 +159,43 @@ fi
 log_info "Removing files and directories..."
 
 # Configuration directory
-if [ -d "/etc/rapidpen" ]; then
-    rm -rf /etc/rapidpen
-    log_info "  Removed /etc/rapidpen/"
+if [ -d "/etc/agenticsec" ]; then
+    rm -rf /etc/agenticsec
+    log_info "  Removed /etc/agenticsec/"
 else
-    log_warn "  /etc/rapidpen/ not found"
+    log_warn "  /etc/agenticsec/ not found"
 fi
 
 # Log directory
-if [ -d "/var/log/rapidpen" ]; then
-    rm -rf /var/log/rapidpen
-    log_info "  Removed /var/log/rapidpen/"
+if [ -d "/var/log/agenticsec" ]; then
+    rm -rf /var/log/agenticsec
+    log_info "  Removed /var/log/agenticsec/"
 else
-    log_warn "  /var/log/rapidpen/ not found"
+    log_warn "  /var/log/agenticsec/ not found"
 fi
 
 # Upgrade check script
-if [ -f "/usr/local/bin/rapidpen-supervisor-check-upgrade.sh" ]; then
-    rm -f /usr/local/bin/rapidpen-supervisor-check-upgrade.sh
-    log_info "  Removed /usr/local/bin/rapidpen-supervisor-check-upgrade.sh"
+if [ -f "/usr/local/bin/agenticsec-supervisor-check-upgrade.sh" ]; then
+    rm -f /usr/local/bin/agenticsec-supervisor-check-upgrade.sh
+    log_info "  Removed /usr/local/bin/agenticsec-supervisor-check-upgrade.sh"
 else
-    log_warn "  /usr/local/bin/rapidpen-supervisor-check-upgrade.sh not found"
+    log_warn "  /usr/local/bin/agenticsec-supervisor-check-upgrade.sh not found"
 fi
 
 # Log cleanup script
-if [ -f "/usr/local/bin/rapidpen-log-cleanup.sh" ]; then
-    rm -f /usr/local/bin/rapidpen-log-cleanup.sh
-    log_info "  Removed /usr/local/bin/rapidpen-log-cleanup.sh"
+if [ -f "/usr/local/bin/agenticsec-log-cleanup.sh" ]; then
+    rm -f /usr/local/bin/agenticsec-log-cleanup.sh
+    log_info "  Removed /usr/local/bin/agenticsec-log-cleanup.sh"
 else
-    log_warn "  /usr/local/bin/rapidpen-log-cleanup.sh not found"
+    log_warn "  /usr/local/bin/agenticsec-log-cleanup.sh not found"
 fi
 
 # Uninstall command itself
-if [ -f "/usr/bin/rapidpen-uninstall" ]; then
-    rm -f /usr/bin/rapidpen-uninstall
-    log_info "  Removed /usr/bin/rapidpen-uninstall"
+if [ -f "/usr/bin/agenticsec-uninstall" ]; then
+    rm -f /usr/bin/agenticsec-uninstall
+    log_info "  Removed /usr/bin/agenticsec-uninstall"
 else
-    log_warn "  /usr/bin/rapidpen-uninstall not found"
+    log_warn "  /usr/bin/agenticsec-uninstall not found"
 fi
 
 # 6. Completion message
@@ -204,6 +204,6 @@ echo "==========================================="
 log_info "Uninstallation completed successfully!"
 echo "==========================================="
 echo ""
-echo "RapidPen Supervisor has been removed from your system."
+echo "AgenticSec Supervisor has been removed from your system."
 echo "To reinstall, run: sudo sh install.sh"
 echo ""

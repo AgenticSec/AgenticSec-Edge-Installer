@@ -7,9 +7,9 @@
 # Supervisor logs
 [INPUT]
     Name              tail
-    Path              /var/log/rapidpen/supervisor/*.jsonl
+    Path              /var/log/agenticsec/supervisor/*.jsonl
     Parser            json
-    Tag               rapidpen.supervisor
+    Tag               agenticsec.supervisor
     Refresh_Interval  5
     Mem_Buf_Limit     5MB
     Skip_Long_Lines   On
@@ -20,9 +20,9 @@
 # Operator logs
 [INPUT]
     Name              tail
-    Path              /var/log/rapidpen/operator/*/*.jsonl
+    Path              /var/log/agenticsec/operator/*/*.jsonl
     Parser            json
-    Tag               rapidpen.operator
+    Tag               agenticsec.operator
     Refresh_Interval  5
     Mem_Buf_Limit     5MB
     Skip_Long_Lines   On
@@ -33,14 +33,14 @@
 # Send all logs to Grafana Cloud Loki
 [OUTPUT]
     Name              loki
-    Match             rapidpen.*
+    Match             agenticsec.*
     Host              {{LOKI_ENDPOINT_HOST}}
     Port              443
     TLS               On
     TLS.verify        On
     HTTP_User         {{LOKI_USER_ID}}
     HTTP_Passwd       {{LOKI_API_TOKEN}}
-    Labels            job=rapidpen
+    Labels            job=agenticsec
     label_keys        $service,$level,$org_id,$run_id,$supervisor_id
     remove_keys       Off
     net.dns.mode        UDP

@@ -1,0 +1,31 @@
+[Unit]
+Description=AgenticSec Supervisor Service
+Documentation=https://github.com/AgenticSec/AgenticSec
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+
+# check if upgrade is required and pull new image if needed
+ExecStartPre=/usr/local/bin/agenticsec-supervisor-check-upgrade.sh
+
+# remove existing container
+ExecStartPre=-{{DOCKER_BIN}} rm -f agenticsec-supervisor
+
+# launch Supervisor container
+ExecStart=/bin/sh -c '{{DOCKER_BIN}} run \
+    --name agenticsec-supervisor \
+    --rm \
+    -v {{DOCKER_SOCK}}:{{DOCKER_SOCK}} \
+    -v /etc/agenticsec/supervisor:/etc/agenticsec/supervisor \
+    -v /var/log/agenticsec/supervisor:/var/log/agenticsec \
+    ghcr.io/agenticsec/agenticsec-supervisor:$(cat /etc/agenticsec/supervisor/state.json | {{JQ_COMMAND}} -r .image_tag)'
+
+ExecStop={{DOCKER_BIN}} stop agenticsec-supervisor
+
+[Install]
+WantedBy=multi-user.target

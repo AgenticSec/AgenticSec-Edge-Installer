@@ -25,58 +25,58 @@ cleanup_on_error() {
     log_error "Installation failed. Cleaning up..."
 
     # Stop and disable supervisor service if it was started
-    if systemctl is-active --quiet rapidpen-supervisor 2>/dev/null; then
-        systemctl stop rapidpen-supervisor
-        log_info "  Stopped rapidpen-supervisor service"
+    if systemctl is-active --quiet agenticsec-supervisor 2>/dev/null; then
+        systemctl stop agenticsec-supervisor
+        log_info "  Stopped agenticsec-supervisor service"
     fi
 
-    if systemctl is-enabled --quiet rapidpen-supervisor 2>/dev/null; then
-        systemctl disable rapidpen-supervisor
-        log_info "  Disabled rapidpen-supervisor service"
+    if systemctl is-enabled --quiet agenticsec-supervisor 2>/dev/null; then
+        systemctl disable agenticsec-supervisor
+        log_info "  Disabled agenticsec-supervisor service"
     fi
 
     # Remove supervisor systemd service file
-    if [ -f /etc/systemd/system/rapidpen-supervisor.service ]; then
-        rm /etc/systemd/system/rapidpen-supervisor.service
-        log_info "  Removed rapidpen-supervisor service file"
+    if [ -f /etc/systemd/system/agenticsec-supervisor.service ]; then
+        rm /etc/systemd/system/agenticsec-supervisor.service
+        log_info "  Removed agenticsec-supervisor service file"
     fi
 
     # Stop and disable fluent-bit service if it was started
-    if systemctl is-active --quiet rapidpen-fluent-bit 2>/dev/null; then
-        systemctl stop rapidpen-fluent-bit
-        log_info "  Stopped rapidpen-fluent-bit service"
+    if systemctl is-active --quiet agenticsec-fluent-bit 2>/dev/null; then
+        systemctl stop agenticsec-fluent-bit
+        log_info "  Stopped agenticsec-fluent-bit service"
     fi
 
-    if systemctl is-enabled --quiet rapidpen-fluent-bit 2>/dev/null; then
-        systemctl disable rapidpen-fluent-bit
-        log_info "  Disabled rapidpen-fluent-bit service"
+    if systemctl is-enabled --quiet agenticsec-fluent-bit 2>/dev/null; then
+        systemctl disable agenticsec-fluent-bit
+        log_info "  Disabled agenticsec-fluent-bit service"
     fi
 
     # Remove fluent-bit systemd service file
-    if [ -f /etc/systemd/system/rapidpen-fluent-bit.service ]; then
-        rm /etc/systemd/system/rapidpen-fluent-bit.service
-        log_info "  Removed rapidpen-fluent-bit service file"
+    if [ -f /etc/systemd/system/agenticsec-fluent-bit.service ]; then
+        rm /etc/systemd/system/agenticsec-fluent-bit.service
+        log_info "  Removed agenticsec-fluent-bit service file"
     fi
 
     # Reload systemd
     systemctl daemon-reload
 
     # Remove upgrade check script
-    if [ -f /usr/local/bin/rapidpen-supervisor-check-upgrade.sh ]; then
-        rm /usr/local/bin/rapidpen-supervisor-check-upgrade.sh
+    if [ -f /usr/local/bin/agenticsec-supervisor-check-upgrade.sh ]; then
+        rm /usr/local/bin/agenticsec-supervisor-check-upgrade.sh
         log_info "  Removed upgrade check script"
     fi
 
     # Remove configuration directories
-    if [ -d /etc/rapidpen ]; then
-        rm -rf /etc/rapidpen
-        log_info "  Removed /etc/rapidpen/"
+    if [ -d /etc/agenticsec ]; then
+        rm -rf /etc/agenticsec
+        log_info "  Removed /etc/agenticsec/"
     fi
 
     # Remove log directories
-    if [ -d /var/log/rapidpen ]; then
-        rm -rf /var/log/rapidpen
-        log_info "  Removed /var/log/rapidpen/"
+    if [ -d /var/log/agenticsec ]; then
+        rm -rf /var/log/agenticsec
+        log_info "  Removed /var/log/agenticsec/"
     fi
 
     # Remove supervisor Docker image
@@ -179,35 +179,35 @@ log_info "✓ Docker daemon is running"
 # 3. 必要なディレクトリ作成
 log_info "Creating required directories..."
 
-# /var/log/rapidpen/supervisor - Supervisorログ用
-if [ ! -d "/var/log/rapidpen/supervisor" ]; then
-    mkdir -p /var/log/rapidpen/supervisor
-    log_info "  Created /var/log/rapidpen/supervisor/"
+# /var/log/agenticsec/supervisor - Supervisorログ用
+if [ ! -d "/var/log/agenticsec/supervisor" ]; then
+    mkdir -p /var/log/agenticsec/supervisor
+    log_info "  Created /var/log/agenticsec/supervisor/"
 else
-    log_info "  /var/log/rapidpen/supervisor/ already exists"
+    log_info "  /var/log/agenticsec/supervisor/ already exists"
 fi
 
-# /var/log/rapidpen/operator - Operatorログ用
-if [ ! -d "/var/log/rapidpen/operator" ]; then
-    mkdir -p /var/log/rapidpen/operator
-    chmod 777 /var/log/rapidpen/operator
-    log_info "  Created /var/log/rapidpen/operator/"
+# /var/log/agenticsec/operator - Operatorログ用
+if [ ! -d "/var/log/agenticsec/operator" ]; then
+    mkdir -p /var/log/agenticsec/operator
+    chmod 777 /var/log/agenticsec/operator
+    log_info "  Created /var/log/agenticsec/operator/"
 else
-    log_info "  /var/log/rapidpen/operator/ already exists"
+    log_info "  /var/log/agenticsec/operator/ already exists"
 fi
 
 # 4. InstallerConfig生成
 log_info "Creating installer configuration file..."
 
-CONFIG_FILE="/etc/rapidpen/supervisor/installer_config.json"
+CONFIG_FILE="/etc/agenticsec/supervisor/installer_config.json"
 
 # 設定ディレクトリが存在しない場合は作成
-if [ ! -d "/etc/rapidpen/supervisor" ]; then
-    mkdir -p /etc/rapidpen/supervisor
-    chmod 700 /etc/rapidpen/supervisor
-    log_info "  Created /etc/rapidpen/supervisor/"
+if [ ! -d "/etc/agenticsec/supervisor" ]; then
+    mkdir -p /etc/agenticsec/supervisor
+    chmod 700 /etc/agenticsec/supervisor
+    log_info "  Created /etc/agenticsec/supervisor/"
 else
-    log_info "  /etc/rapidpen/supervisor/ already exists"
+    log_info "  /etc/agenticsec/supervisor/ already exists"
 fi
 
 # supervisor_id_candidate生成（デフォルト：sup-hostname）
@@ -220,8 +220,8 @@ INSTALLER_CONFIG_TEMPLATE="$SCRIPT_DIR/templates/installer_config.json.template"
 
 if [ -f "$INSTALLER_CONFIG_TEMPLATE" ]; then
     sed -e "s|{{SUPERVISOR_ID_CANDIDATE}}|$SUPERVISOR_ID_CANDIDATE|g" \
-        -e "s|{{LOG_DIR_SUPERVISOR}}|/var/log/rapidpen/supervisor|g" \
-        -e "s|{{LOG_DIR_OPERATOR_BASE}}|/var/log/rapidpen/operator|g" \
+        -e "s|{{LOG_DIR_SUPERVISOR}}|/var/log/agenticsec/supervisor|g" \
+        -e "s|{{LOG_DIR_OPERATOR_BASE}}|/var/log/agenticsec/operator|g" \
         "$INSTALLER_CONFIG_TEMPLATE" > "$CONFIG_FILE"
     chmod 600 "$CONFIG_FILE"
     log_info "  Created installer configuration: $CONFIG_FILE"
@@ -231,26 +231,26 @@ else
     exit 1
 fi
 
-# 5. RapidPen Cloud接続情報の入力
-log_info "Configuring RapidPen Cloud connection..."
+# 5. AgenticSec Cloud接続情報の入力
+log_info "Configuring AgenticSec Cloud connection..."
 
 # API Key入力（必須）
-if [ -n "$RAPIDPEN_API_KEY" ]; then
+if [ -n "$AGENTICSEC_API_KEY" ]; then
     # 環境変数から取得（テスト用）
     log_info "  Using API Key from environment variable"
 else
     # ユーザーから入力
     echo ""
-    echo "Please enter your RapidPen Cloud API Key:"
-    echo "(You can obtain this from RapidPen Cloud Web UI)"
+    echo "Please enter your AgenticSec Cloud API Key:"
+    echo "(You can obtain this from AgenticSec Cloud Web UI)"
     printf "API Key: "
-    read -r RAPIDPEN_API_KEY < /dev/tty
+    read -r AGENTICSEC_API_KEY < /dev/tty
 
     # 空チェック
-    while [ -z "$RAPIDPEN_API_KEY" ]; do
+    while [ -z "$AGENTICSEC_API_KEY" ]; do
         log_error "API Key cannot be empty"
         printf "API Key: "
-        read -r RAPIDPEN_API_KEY < /dev/tty
+        read -r AGENTICSEC_API_KEY < /dev/tty
     done
 
     log_info "  API Key configured"
@@ -259,37 +259,37 @@ fi
 # Base URL入力（オプション、デフォルト値あり）
 DEFAULT_BASEURL="https://api.rapidpen.app/api/edge/supervisor"
 
-if [ -n "$RAPIDPEN_BASEURL" ]; then
+if [ -n "$AGENTICSEC_BASEURL" ]; then
     # 環境変数から取得（テスト用）
-    log_info "  Using Base URL from environment variable: $RAPIDPEN_BASEURL"
+    log_info "  Using Base URL from environment variable: $AGENTICSEC_BASEURL"
 else
     # ユーザーから入力
     echo ""
-    echo "RapidPen Cloud Base URL (default: $DEFAULT_BASEURL)"
+    echo "AgenticSec Cloud Base URL (default: $DEFAULT_BASEURL)"
     echo "(Press Enter to use default, or enter custom URL)"
     printf "Base URL: "
-    read -r RAPIDPEN_BASEURL < /dev/tty
+    read -r AGENTICSEC_BASEURL < /dev/tty
 
     # 空の場合はデフォルト値を使用
-    if [ -z "$RAPIDPEN_BASEURL" ]; then
-        RAPIDPEN_BASEURL="$DEFAULT_BASEURL"
-        log_info "  Using default base URL: $RAPIDPEN_BASEURL"
+    if [ -z "$AGENTICSEC_BASEURL" ]; then
+        AGENTICSEC_BASEURL="$DEFAULT_BASEURL"
+        log_info "  Using default base URL: $AGENTICSEC_BASEURL"
     else
-        log_info "  Using custom base URL: $RAPIDPEN_BASEURL"
+        log_info "  Using custom base URL: $AGENTICSEC_BASEURL"
     fi
 fi
 
 # 6. SupervisorState 初期ファイル作成（後でimage_tagを更新）
 log_info "Creating initial supervisor state file..."
 
-STATE_FILE="/etc/rapidpen/supervisor/state.json"
+STATE_FILE="/etc/agenticsec/supervisor/state.json"
 STATE_TEMPLATE="$SCRIPT_DIR/templates/state.json.template"
 
 # 仮のimage_tagで初期化（後でGHCRから取得したタグに更新）
 if [ -f "$STATE_TEMPLATE" ]; then
     sed -e "s|{{IMAGE_TAG}}|PLACEHOLDER|g" \
-        -e "s|{{RAPIDPEN_CLOUD_API_KEY}}|$RAPIDPEN_API_KEY|g" \
-        -e "s|{{RAPIDPEN_CLOUD_BASEURL}}|$RAPIDPEN_BASEURL|g" \
+        -e "s|{{AGENTICSEC_CLOUD_API_KEY}}|$AGENTICSEC_API_KEY|g" \
+        -e "s|{{AGENTICSEC_CLOUD_BASEURL}}|$AGENTICSEC_BASEURL|g" \
         "$STATE_TEMPLATE" > "$STATE_FILE"
     chmod 600 "$STATE_FILE"
     log_info "  Created supervisor state: $STATE_FILE (image_tag will be updated after fetching image)"
@@ -354,7 +354,7 @@ fi
 log_info "Latest supervisor version: $SUPERVISOR_VERSION"
 
 # Supervisorイメージを構築
-SUPERVISOR_IMAGE="ghcr.io/agenticsec/rapidpen-supervisor:$SUPERVISOR_VERSION"
+SUPERVISOR_IMAGE="ghcr.io/agenticsec/agenticsec-supervisor:$SUPERVISOR_VERSION"
 log_info "Supervisor image: $SUPERVISOR_IMAGE"
 
 # Supervisorイメージをpull
@@ -379,8 +379,8 @@ IMAGE_TAG="$SUPERVISOR_VERSION"  # バージョン文字列をそのまま使用
 # JSONファイルの更新（PLACEHOLDER → 実際のタグ）
 if [ -f "$STATE_TEMPLATE" ]; then
     sed -e "s|{{IMAGE_TAG}}|$IMAGE_TAG|g" \
-        -e "s|{{RAPIDPEN_CLOUD_API_KEY}}|$RAPIDPEN_API_KEY|g" \
-        -e "s|{{RAPIDPEN_CLOUD_BASEURL}}|$RAPIDPEN_BASEURL|g" \
+        -e "s|{{AGENTICSEC_CLOUD_API_KEY}}|$AGENTICSEC_API_KEY|g" \
+        -e "s|{{AGENTICSEC_CLOUD_BASEURL}}|$AGENTICSEC_BASEURL|g" \
         "$STATE_TEMPLATE" > "$STATE_FILE"
     log_info "  Updated image tag: $IMAGE_TAG"
 else
@@ -392,8 +392,8 @@ fi
 # 7.5. アップグレードチェックスクリプトをインストール
 log_info "Installing upgrade check script..."
 
-UPGRADE_SCRIPT_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-supervisor-check-upgrade.sh"
-UPGRADE_SCRIPT_TARGET="/usr/local/bin/rapidpen-supervisor-check-upgrade.sh"
+UPGRADE_SCRIPT_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-supervisor-check-upgrade.sh"
+UPGRADE_SCRIPT_TARGET="/usr/local/bin/agenticsec-supervisor-check-upgrade.sh"
 
 if [ -f "$UPGRADE_SCRIPT_TEMPLATE" ]; then
     # スクリプトをコピー
@@ -421,7 +421,7 @@ fi
 
 # サービステンプレートファイルの場所を探す
 SCRIPT_DIR=$(dirname "$0")
-SERVICE_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-supervisor.service.template"
+SERVICE_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-supervisor.service.template"
 
 if [ ! -f "$SERVICE_TEMPLATE" ]; then
     log_error "Service template not found at $SERVICE_TEMPLATE"
@@ -440,8 +440,8 @@ fi
 sed -e "s|{{DOCKER_BIN}}|$DOCKER_BIN|g" \
     -e "s|{{DOCKER_SOCK}}|$DOCKER_SOCK|g" \
     -e "s|{{JQ_COMMAND}}|$JQ_COMMAND|g" \
-    "$SERVICE_TEMPLATE" > /etc/systemd/system/rapidpen-supervisor.service
-log_info "  Created service file at /etc/systemd/system/rapidpen-supervisor.service"
+    "$SERVICE_TEMPLATE" > /etc/systemd/system/agenticsec-supervisor.service
+log_info "  Created service file at /etc/systemd/system/agenticsec-supervisor.service"
 log_info "  Using Docker binary: $DOCKER_BIN"
 log_info "  Using Docker socket: $DOCKER_SOCK"
 log_info "  Using jq command: $JQ_COMMAND"
@@ -451,18 +451,18 @@ systemctl daemon-reload
 log_info "  Reloaded systemd daemon"
 
 # サービスを有効化（自動起動）
-systemctl enable rapidpen-supervisor
-log_info "  Enabled rapidpen-supervisor service (auto-start on boot)"
+systemctl enable agenticsec-supervisor
+log_info "  Enabled agenticsec-supervisor service (auto-start on boot)"
 
 # サービスを起動
-systemctl start rapidpen-supervisor
-log_info "  Started rapidpen-supervisor service"
+systemctl start agenticsec-supervisor
+log_info "  Started agenticsec-supervisor service"
 
 # 9. Observability設定（Fluent Bit setup）
 log_info "Setting up observability (Fluent Bit for log collection)..."
 
 # 9.1 Observability設定ディレクトリ作成
-OBSERVABILITY_DIR="/etc/rapidpen/edge-observability"
+OBSERVABILITY_DIR="/etc/agenticsec/edge-observability"
 if [ ! -d "$OBSERVABILITY_DIR" ]; then
     mkdir -p "$OBSERVABILITY_DIR"
     chmod 700 "$OBSERVABILITY_DIR"
@@ -472,11 +472,11 @@ else
 fi
 
 # 9.2 Hub APIからObservability設定取得
-log_info "Fetching observability configuration from RapidPen Hub..."
+log_info "Fetching observability configuration from AgenticSec Hub..."
 
-# Edge API Keyはstate.jsonから取得（既存のRAPIDPEN_CLOUD_API_KEYを流用）
+# Edge API Keyはstate.jsonから取得（既存のAGENTICSEC_CLOUD_API_KEYを流用）
 # NOTE: パイプ経由で渡す（Docker版jqはホストのファイルパスを読めないため）
-EDGE_API_KEY=$(cat "$STATE_FILE" | jq_exec -r '.rapidpen_cloud_api_key') || {
+EDGE_API_KEY=$(cat "$STATE_FILE" | jq_exec -r '.agenticsec_cloud_api_key') || {
     log_error "Failed to read API key from state file: $STATE_FILE"
     log_error "  Please check if the file exists and contains valid JSON"
     cleanup_on_error
@@ -492,7 +492,7 @@ fi
 
 # Base URLからObservability APIエンドポイントを構築
 # 例: https://api.rapidpen.app/api/edge/supervisor → https://api.rapidpen.app/api/edge/installer/v1/observability
-OBSERVABILITY_API_URL=$(echo "$RAPIDPEN_BASEURL" | sed 's|/api/edge/supervisor|/api/edge/installer/v1/observability|')
+OBSERVABILITY_API_URL=$(echo "$AGENTICSEC_BASEURL" | sed 's|/api/edge/supervisor|/api/edge/installer/v1/observability|')
 
 # curlエラーをキャッチ（set -e でスクリプトが終了しないように）
 OBSERVABILITY_RESPONSE=$(curl --max-time 30 -fsSL \
@@ -574,19 +574,19 @@ else
             fi
 
             # 9.5 Fluent Bit systemd サービスインストール
-            FLUENT_BIT_SERVICE_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-fluent-bit.service.template"
+            FLUENT_BIT_SERVICE_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-fluent-bit.service.template"
             if [ -f "$FLUENT_BIT_SERVICE_TEMPLATE" ]; then
                 sed -e "s|{{DOCKER_BIN}}|$DOCKER_BIN|g" \
-                    "$FLUENT_BIT_SERVICE_TEMPLATE" > /etc/systemd/system/rapidpen-fluent-bit.service
-                log_info "  Created service file at /etc/systemd/system/rapidpen-fluent-bit.service"
+                    "$FLUENT_BIT_SERVICE_TEMPLATE" > /etc/systemd/system/agenticsec-fluent-bit.service
+                log_info "  Created service file at /etc/systemd/system/agenticsec-fluent-bit.service"
 
                 # systemdをリロード
                 systemctl daemon-reload
                 log_info "  Reloaded systemd daemon"
 
                 # サービスを有効化（自動起動）
-                systemctl enable rapidpen-fluent-bit
-                log_info "  Enabled rapidpen-fluent-bit service (auto-start on boot)"
+                systemctl enable agenticsec-fluent-bit
+                log_info "  Enabled agenticsec-fluent-bit service (auto-start on boot)"
 
                 # Fluent Bitイメージをpull
                 log_info "Pulling Fluent Bit image..."
@@ -600,8 +600,8 @@ else
                 fi
 
                 # サービスを起動
-                systemctl start rapidpen-fluent-bit
-                log_info "  Started rapidpen-fluent-bit service"
+                systemctl start agenticsec-fluent-bit
+                log_info "  Started agenticsec-fluent-bit service"
                 log_info "  ✓ Observability setup completed"
             else
                 log_error "Template not found: $FLUENT_BIT_SERVICE_TEMPLATE"
@@ -620,10 +620,10 @@ fi
 # 10. ログクリーンアップ（日次ローテーション + 7日保持）
 log_info "Installing log cleanup timer..."
 
-LOG_CLEANUP_SCRIPT_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-log-cleanup.sh"
-LOG_CLEANUP_SERVICE_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-log-cleanup.service.template"
-LOG_CLEANUP_TIMER_TEMPLATE="$SCRIPT_DIR/templates/rapidpen-log-cleanup.timer.template"
-LOG_CLEANUP_SCRIPT_TARGET="/usr/local/bin/rapidpen-log-cleanup.sh"
+LOG_CLEANUP_SCRIPT_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-log-cleanup.sh"
+LOG_CLEANUP_SERVICE_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-log-cleanup.service.template"
+LOG_CLEANUP_TIMER_TEMPLATE="$SCRIPT_DIR/templates/agenticsec-log-cleanup.timer.template"
+LOG_CLEANUP_SCRIPT_TARGET="/usr/local/bin/agenticsec-log-cleanup.sh"
 
 if [ -f "$LOG_CLEANUP_SCRIPT_TEMPLATE" ] && [ -f "$LOG_CLEANUP_SERVICE_TEMPLATE" ] && [ -f "$LOG_CLEANUP_TIMER_TEMPLATE" ]; then
     # Install cleanup script
@@ -632,17 +632,17 @@ if [ -f "$LOG_CLEANUP_SCRIPT_TEMPLATE" ] && [ -f "$LOG_CLEANUP_SERVICE_TEMPLATE"
     log_info "  Installed cleanup script: $LOG_CLEANUP_SCRIPT_TARGET"
 
     # Install systemd service (no template variables to substitute)
-    cp "$LOG_CLEANUP_SERVICE_TEMPLATE" /etc/systemd/system/rapidpen-log-cleanup.service
-    log_info "  Created service file at /etc/systemd/system/rapidpen-log-cleanup.service"
+    cp "$LOG_CLEANUP_SERVICE_TEMPLATE" /etc/systemd/system/agenticsec-log-cleanup.service
+    log_info "  Created service file at /etc/systemd/system/agenticsec-log-cleanup.service"
 
     # Install systemd timer (no template variables to substitute)
-    cp "$LOG_CLEANUP_TIMER_TEMPLATE" /etc/systemd/system/rapidpen-log-cleanup.timer
-    log_info "  Created timer file at /etc/systemd/system/rapidpen-log-cleanup.timer"
+    cp "$LOG_CLEANUP_TIMER_TEMPLATE" /etc/systemd/system/agenticsec-log-cleanup.timer
+    log_info "  Created timer file at /etc/systemd/system/agenticsec-log-cleanup.timer"
 
     # Reload systemd and enable timer
     systemctl daemon-reload
-    systemctl enable --now rapidpen-log-cleanup.timer
-    log_info "  Enabled and started rapidpen-log-cleanup.timer (daily)"
+    systemctl enable --now agenticsec-log-cleanup.timer
+    log_info "  Enabled and started agenticsec-log-cleanup.timer (daily)"
     log_info "  ✓ Log cleanup setup completed"
 else
     log_warn "Log cleanup templates not found (skipping)"
@@ -655,14 +655,14 @@ fi
 log_info "Installing uninstall command..."
 
 UNINSTALL_SCRIPT="$SCRIPT_DIR/uninstall.sh"
-UNINSTALL_TARGET="/usr/bin/rapidpen-uninstall"
+UNINSTALL_TARGET="/usr/bin/agenticsec-uninstall"
 
 if [ -f "$UNINSTALL_SCRIPT" ]; then
     # アンインストーラーをコピー
     cp "$UNINSTALL_SCRIPT" "$UNINSTALL_TARGET"
     # 実行権限を設定
     chmod 755 "$UNINSTALL_TARGET"
-    log_info "  Installed uninstall command: rapidpen-uninstall"
+    log_info "  Installed uninstall command: agenticsec-uninstall"
 else
     log_warn "Uninstall script not found at $UNINSTALL_SCRIPT"
     log_warn "Skipping uninstall command installation"
@@ -678,20 +678,20 @@ echo "Services are now running!"
 echo ""
 echo "Useful commands:"
 echo "  Supervisor:"
-echo "    Check status: sudo systemctl status rapidpen-supervisor"
-echo "    View logs:    sudo journalctl -u rapidpen-supervisor -f"
-echo "    Stop:         sudo systemctl stop rapidpen-supervisor"
-echo "    Restart:      sudo systemctl restart rapidpen-supervisor"
+echo "    Check status: sudo systemctl status agenticsec-supervisor"
+echo "    View logs:    sudo journalctl -u agenticsec-supervisor -f"
+echo "    Stop:         sudo systemctl stop agenticsec-supervisor"
+echo "    Restart:      sudo systemctl restart agenticsec-supervisor"
 echo ""
 echo "  Fluent Bit (Log Collection):"
-echo "    Check status: sudo systemctl status rapidpen-fluent-bit"
-echo "    View logs:    sudo journalctl -u rapidpen-fluent-bit -f"
-echo "    Stop:         sudo systemctl stop rapidpen-fluent-bit"
-echo "    Restart:      sudo systemctl restart rapidpen-fluent-bit"
+echo "    Check status: sudo systemctl status agenticsec-fluent-bit"
+echo "    View logs:    sudo journalctl -u agenticsec-fluent-bit -f"
+echo "    Stop:         sudo systemctl stop agenticsec-fluent-bit"
+echo "    Restart:      sudo systemctl restart agenticsec-fluent-bit"
 echo ""
 echo "  Log Cleanup (daily timer):"
-echo "    Check timer:  sudo systemctl list-timers rapidpen-log-cleanup.timer"
-echo "    Run manually: sudo systemctl start rapidpen-log-cleanup.service"
-echo "    View logs:    sudo journalctl -u rapidpen-log-cleanup.service"
+echo "    Check timer:  sudo systemctl list-timers agenticsec-log-cleanup.timer"
+echo "    Run manually: sudo systemctl start agenticsec-log-cleanup.service"
+echo "    View logs:    sudo journalctl -u agenticsec-log-cleanup.service"
 echo ""
-echo "  Uninstall:    sudo rapidpen-uninstall"
+echo "  Uninstall:    sudo agenticsec-uninstall"
