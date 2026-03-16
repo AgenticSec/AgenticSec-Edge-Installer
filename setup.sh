@@ -96,6 +96,50 @@ cleanup_on_error() {
     log_error "Cleanup completed. Please resolve the issue and try again."
 }
 
+# Legacy rapidpen-* resources cleanup (pre-install)
+cleanup_legacy_services() {
+    found_legacy=false
+    for service in rapidpen-supervisor.service rapidpen-fluent-bit.service rapidpen-log-cleanup.timer rapidpen-log-cleanup.service; do
+        if [ -f "/etc/systemd/system/$service" ]; then
+            found_legacy=true
+            log_info "  Found legacy service: $service, removing..."
+            systemctl stop "$service" 2>/dev/null || true
+            systemctl disable "$service" 2>/dev/null || true
+            rm -f "/etc/systemd/system/$service"
+        fi
+    done
+    if [ "$found_legacy" = true ]; then
+        systemctl daemon-reload
+        log_info "  Legacy services cleaned up"
+    fi
+    # Legacy files/directories
+    for legacy_dir in /etc/rapidpen /var/log/rapidpen; do
+        if [ -d "$legacy_dir" ]; then
+            rm -rf "$legacy_dir"
+            log_info "  Removed legacy directory: $legacy_dir"
+        fi
+    done
+    for legacy_file in /usr/local/bin/rapidpen-supervisor-check-upgrade.sh /usr/local/bin/rapidpen-log-cleanup.sh /usr/bin/rapidpen-uninstall; do
+        if [ -f "$legacy_file" ]; then
+            rm -f "$legacy_file"
+            log_info "  Removed legacy file: $legacy_file"
+        fi
+    done
+    # Legacy Docker resources
+    if command -v docker > /dev/null 2>&1; then
+        for container in rapidpen-supervisor rapidpen-fluent-bit; do
+            if docker ps -a 2>/dev/null | grep -q "$container"; then
+                docker rm -f "$container" > /dev/null 2>&1
+                log_info "  Removed legacy container: $container"
+            fi
+        done
+        if docker volume inspect rapidpen-fluent-bit-data >/dev/null 2>&1; then
+            docker volume rm rapidpen-fluent-bit-data > /dev/null 2>&1
+            log_info "  Removed legacy volume: rapidpen-fluent-bit-data"
+        fi
+    fi
+}
+
 echo "==========================="
 echo "  AgenticSec Edge Installer  "
 echo "==========================="
@@ -175,6 +219,10 @@ if ! "$DOCKER_BIN" info > /dev/null 2>&1; then
     exit 1
 fi
 log_info "✓ Docker daemon is running"
+
+# Pre-install: Clean up legacy rapidpen-* resources
+log_info "Checking for legacy rapidpen-* resources..."
+cleanup_legacy_services
 
 # 3. 必要なディレクトリ作成
 log_info "Creating required directories..."
