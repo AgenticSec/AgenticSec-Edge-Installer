@@ -257,7 +257,7 @@ else
 fi
 
 # Base URL入力（オプション、デフォルト値あり）
-DEFAULT_BASEURL="https://api.rapidpen.app/api/edge/supervisor"
+DEFAULT_BASEURL="https://api.agenticsec.tech/api/edge/supervisor"
 
 if [ -n "$AGENTICSEC_BASEURL" ]; then
     # 環境変数から取得（テスト用）
@@ -491,7 +491,7 @@ if [ -z "$EDGE_API_KEY" ] || [ "$EDGE_API_KEY" = "null" ]; then
 fi
 
 # Base URLからObservability APIエンドポイントを構築
-# 例: https://api.rapidpen.app/api/edge/supervisor → https://api.rapidpen.app/api/edge/installer/v1/observability
+# 例: https://api.agenticsec.tech/api/edge/supervisor → https://api.agenticsec.tech/api/edge/installer/v1/observability
 OBSERVABILITY_API_URL=$(echo "$AGENTICSEC_BASEURL" | sed 's|/api/edge/supervisor|/api/edge/installer/v1/observability|')
 
 # curlエラーをキャッチ（set -e でスクリプトが終了しないように）
