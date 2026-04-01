@@ -22,7 +22,7 @@ ExecStart=/bin/sh -c '{{DOCKER_BIN}} run \
     --rm \
     -v {{DOCKER_SOCK}}:{{DOCKER_SOCK}} \
     -v /etc/agenticsec/supervisor:/etc/agenticsec/supervisor \
-    -v /var/log/agenticsec/supervisor:/var/log/agenticsec \
+    -v /var/log/agenticsec/supervisor:/var/log/agenticsec/supervisor \
     ghcr.io/agenticsec/agenticsec-supervisor:$(cat /etc/agenticsec/supervisor/state.json | {{JQ_COMMAND}} -r .image_tag)'
 
 ExecStop={{DOCKER_BIN}} stop agenticsec-supervisor

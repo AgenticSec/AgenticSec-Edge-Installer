@@ -28,6 +28,14 @@ if [ -d "$LOG_BASE/supervisor" ]; then
     for jsonl in "$LOG_BASE"/supervisor/*.jsonl; do
         [ -f "$jsonl" ] || continue
         base=$(basename "$jsonl" .jsonl)
+
+        # Skip already rotated files (matching *-YYYYMMDD pattern)
+        # Without this guard, rotated files get re-rotated daily,
+        # causing combinatorial explosion (e.g. supervisor-20260317-20260318-....jsonl)
+        case "$base" in
+            *-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]) continue ;;
+        esac
+
         dir=$(dirname "$jsonl")
         rotated="$dir/${base}-${TODAY}.jsonl"
 
