@@ -287,7 +287,13 @@ if [ -n "$AGENTICSEC_API_KEY" ]; then
     # 環境変数から取得（テスト用）
     log_info "  Using API Key from environment variable"
 else
-    # ユーザーから入力
+    # ユーザーから入力（TTYが必要）
+    if [ ! -e /dev/tty ]; then
+        log_error "No TTY available and AGENTICSEC_API_KEY environment variable is not set"
+        log_error "  For non-interactive environments (e.g. cloud-init), set the environment variable:"
+        log_error "    export AGENTICSEC_API_KEY='your-api-key'"
+        exit 1
+    fi
     echo ""
     echo "Please enter your AgenticSec Cloud API Key:"
     echo "(You can obtain this from AgenticSec Cloud Web UI)"
@@ -311,19 +317,24 @@ if [ -n "$AGENTICSEC_BASEURL" ]; then
     # 環境変数から取得（テスト用）
     log_info "  Using Base URL from environment variable: $AGENTICSEC_BASEURL"
 else
-    # ユーザーから入力
-    echo ""
-    echo "AgenticSec Cloud Base URL (default: $DEFAULT_BASEURL)"
-    echo "(Press Enter to use default, or enter custom URL)"
-    printf "Base URL: "
-    read -r AGENTICSEC_BASEURL < /dev/tty
-
-    # 空の場合はデフォルト値を使用
-    if [ -z "$AGENTICSEC_BASEURL" ]; then
+    # ユーザーから入力（TTYが必要、無い場合はデフォルト値を使用）
+    if [ ! -e /dev/tty ]; then
         AGENTICSEC_BASEURL="$DEFAULT_BASEURL"
-        log_info "  Using default base URL: $AGENTICSEC_BASEURL"
+        log_info "  No TTY available, using default base URL: $AGENTICSEC_BASEURL"
     else
-        log_info "  Using custom base URL: $AGENTICSEC_BASEURL"
+        echo ""
+        echo "AgenticSec Cloud Base URL (default: $DEFAULT_BASEURL)"
+        echo "(Press Enter to use default, or enter custom URL)"
+        printf "Base URL: "
+        read -r AGENTICSEC_BASEURL < /dev/tty
+
+        # 空の場合はデフォルト値を使用
+        if [ -z "$AGENTICSEC_BASEURL" ]; then
+            AGENTICSEC_BASEURL="$DEFAULT_BASEURL"
+            log_info "  Using default base URL: $AGENTICSEC_BASEURL"
+        else
+            log_info "  Using custom base URL: $AGENTICSEC_BASEURL"
+        fi
     fi
 fi
 
