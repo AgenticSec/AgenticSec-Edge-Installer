@@ -606,12 +606,18 @@ else
                 cleanup_on_error
                 exit 1
             }
+            ENV_NAME=$(echo "$OBSERVABILITY_RESPONSE" | jq_exec -r '.env') || {
+                log_error "Failed to parse env from observability response"
+                cleanup_on_error
+                exit 1
+            }
 
-            if [ -z "$LOKI_HOST" ] || [ -z "$LOKI_USER_ID" ] || [ "$LOKI_USER_ID" = "null" ] || [ -z "$LOKI_API_TOKEN" ] || [ "$LOKI_API_TOKEN" = "null" ]; then
+            if [ -z "$LOKI_HOST" ] || [ -z "$LOKI_USER_ID" ] || [ "$LOKI_USER_ID" = "null" ] || [ -z "$LOKI_API_TOKEN" ] || [ "$LOKI_API_TOKEN" = "null" ] || [ -z "$ENV_NAME" ] || [ "$ENV_NAME" = "null" ]; then
                 log_error "Incomplete observability configuration received from Hub"
                 log_error "  log_endpoint host: ${LOKI_HOST:-<empty>}"
                 log_error "  log_user_id: ${LOKI_USER_ID:-<empty>}"
                 log_error "  log_api_token: $(if [ -n "$LOKI_API_TOKEN" ] && [ "$LOKI_API_TOKEN" != "null" ]; then echo '<set>'; else echo '<empty>'; fi)"
+                log_error "  env: ${ENV_NAME:-<empty>}"
                 log_error "  Please check the Hub observability configuration."
                 cleanup_on_error
                 exit 1
@@ -623,6 +629,7 @@ else
                     -e "s|{{LOKI_USER_ID}}|$LOKI_USER_ID|g" \
                     -e "s|{{LOKI_API_TOKEN}}|$LOKI_API_TOKEN|g" \
                     -e "s|{{SUPERVISOR_ID}}|$SUPERVISOR_ID_CANDIDATE|g" \
+                    -e "s|{{ENV}}|$ENV_NAME|g" \
                     "$FLUENT_BIT_CONFIG_TEMPLATE" > "$OBSERVABILITY_DIR/fluent-bit.conf"
                 chmod 644 "$OBSERVABILITY_DIR/fluent-bit.conf"
                 log_info "  Created Fluent Bit configuration: $OBSERVABILITY_DIR/fluent-bit.conf"
