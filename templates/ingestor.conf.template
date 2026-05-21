@@ -1,0 +1,39 @@
+# Cloud-side Log Ingestor (Fluent Bit aggregator) — dual-output alongside the
+# direct Loki sink above. Rendered by setup.sh from this template only when the
+# Hub /api/edge/installer/v1/observability response provides both
+# `log_ingest_endpoint` and `log_ingest_api_token`. Otherwise setup.sh writes
+# an empty placeholder so the @INCLUDE in fluent-bit.conf still resolves.
+#
+# Auth contract (Notion #744 + PR #1486):
+#   - Edge fluent-bit MUST inject `_auth_token_hash: sha256:<hex>` into every
+#     record body. Cloud Lua filter looks the hash up in /shared/api-keys.json
+#     and stamps `org_id` / `scope` / `ingestor_key_version` on success.
+#   - `Authorization: Bearer <plaintext>` is sent at the transport layer for
+#     ALB access-log observability only; Cloud Lua does not consult it.
+#   - `org_id` is intentionally NOT set here — Cloud stamps it from the hash
+#     lookup so Edge cannot forge labels.
+#   - `service` / `env` / `job` MUST be present on the record (Cloud Loki
+#     OUTPUT references them as $record['...'] in its Labels line).
+
+[FILTER]
+    Name          record_modifier
+    Match         agenticsec.*
+    Record        env {{ENV}}
+    Record        job agenticsec
+    Record        _auth_token_hash sha256:{{AUTH_TOKEN_HASH}}
+
+[OUTPUT]
+    Name              http
+    Match             agenticsec.*
+    Host              {{LOG_INGEST_HOST}}
+    Port              443
+    URI               /api/v1/edge-logs
+    TLS               On
+    TLS.verify        On
+    Format            json
+    Header            Authorization Bearer {{LOG_INGEST_TOKEN_PLAIN}}
+    storage.total_limit_size 1G
+    Retry_Limit       no_limits
+    net.dns.mode        UDP
+    net.dns.resolver    LEGACY
+    net.dns.prefer_ipv4 true
